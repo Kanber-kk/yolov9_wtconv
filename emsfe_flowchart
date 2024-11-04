@@ -1,0 +1,36 @@
+// EMSFE Module Flowchart
+digraph {
+	rankdir=LR
+	Input [label="Input: (batch_size, in_channels, H, W)"]
+	Center [label="Center Branch
+3x3 Conv"]
+	Left [label="Left Branch
+3x1 + 1x3 + 3x1 + 1x3 + 1x1 Conv
+Dilation=5"]
+	Right [label="Right Branch
+5x1 + 1x5 + 5x1 + 1x5 + 1x1 Conv
+Dilation=7"]
+	One [label="One Branch
+1x1 Conv"]
+	Input -> Center
+	Input -> Left
+	Input -> Right
+	Input -> One
+	Concat [label="Concatenate
+(dim=1)"]
+	Center -> Concat
+	Left -> Concat
+	Right -> Concat
+	One -> Concat
+	CoordAtt [label="Coordinate Attention"]
+	Concat -> CoordAtt
+	ChannelReduction [label="1x1 Conv
+Channel Reduction"]
+	CoordAtt -> ChannelReduction
+	Residual [label="Residual Connection
+(Input + Output)"]
+	Input -> Residual [style=dashed]
+	ChannelReduction -> Residual
+	Output [label="Output: (batch_size, out_channels, H, W)"]
+	Residual -> Output
+}
